@@ -10,7 +10,7 @@ app.use(express.json());
 // Import Routes
 const authRoutes = require("./routes/authRoutes");
 const protectedRoutes = require("./routes/protectedRoutes");
-
+const deviceRoutes = require("./routes/deviceRoutes");
 // Home Route
 app.get("/", (req, res) => {
   res.json({
@@ -23,5 +23,6 @@ app.get("/", (req, res) => {
 // Authentication Routes
 app.use("/api/auth", authRoutes);
 app.use("/api", protectedRoutes);
+app.use("/api/device", deviceRoutes);
 
 module.exports = app;
