@@ -1,7 +1,7 @@
 const Device = require("../models/Device");
 
+// Register a new Smart Shoe
 const registerDevice = async (req, res) => {
-
     try {
 
         const { shoeName, esp32Mac } = req.body;
@@ -27,32 +27,55 @@ const registerDevice = async (req, res) => {
 
         });
 
-        res.status(201).json({
+        return res.status(201).json({
 
             success: true,
-
             message: "Device Registered Successfully",
-
             device
 
         });
 
     } catch (error) {
 
-        res.status(500).json({
+        return res.status(500).json({
 
             success: false,
-
             message: error.message
 
         });
 
     }
+};
 
+// Get all devices registered by the logged-in parent
+const getMyDevices = async (req, res) => {
+    try {
+
+        const devices = await Device.find({
+            parentId: req.user.id
+        });
+
+        return res.status(200).json({
+
+            success: true,
+            count: devices.length,
+            devices
+
+        });
+
+    } catch (error) {
+
+        return res.status(500).json({
+
+            success: false,
+            message: error.message
+
+        });
+
+    }
 };
 
 module.exports = {
-
-    registerDevice
-
+    registerDevice,
+    getMyDevices
 };
