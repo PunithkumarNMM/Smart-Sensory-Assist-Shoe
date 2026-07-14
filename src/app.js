@@ -11,6 +11,7 @@ app.use(express.json());
 const authRoutes = require("./routes/authRoutes");
 const protectedRoutes = require("./routes/protectedRoutes");
 const deviceRoutes = require("./routes/deviceRoutes");
+const gpsRoutes = require("./routes/gpsRoutes");
 // Home Route
 app.get("/", (req, res) => {
   res.json({
@@ -24,5 +25,6 @@ app.get("/", (req, res) => {
 app.use("/api/auth", authRoutes);
 app.use("/api", protectedRoutes);
 app.use("/api/device", deviceRoutes);
+app.use("/api/gps", gpsRoutes);
 
 module.exports = app;
