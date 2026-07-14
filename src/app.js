@@ -9,6 +9,7 @@ app.use(express.json());
 
 // Import Routes
 const authRoutes = require("./routes/authRoutes");
+const protectedRoutes = require("./routes/protectedRoutes");
 
 // Home Route
 app.get("/", (req, res) => {
@@ -21,5 +22,6 @@ app.get("/", (req, res) => {
 
 // Authentication Routes
 app.use("/api/auth", authRoutes);
+app.use("/api", protectedRoutes);
 
 module.exports = app;
