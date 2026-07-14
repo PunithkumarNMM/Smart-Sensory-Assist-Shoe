@@ -75,7 +75,50 @@ const getMyDevices = async (req, res) => {
     }
 };
 
+// Update Device Status (Battery, Online/Offline, Last Seen)
+const updateDeviceStatus = async (req, res) => {
+    try {
+
+        const { deviceId } = req.params;
+        const { batteryLevel, status } = req.body;
+
+        const device = await Device.findOne({ deviceId });
+
+        if (!device) {
+            return res.status(404).json({
+                success: false,
+                message: "Device not found"
+            });
+        }
+
+        device.batteryLevel = batteryLevel;
+        device.status = status;
+        device.lastSeen = new Date();
+
+        await device.save();
+
+        return res.status(200).json({
+
+            success: true,
+            message: "Device Status Updated Successfully",
+            device
+
+        });
+
+    } catch (error) {
+
+        return res.status(500).json({
+
+            success: false,
+            message: error.message
+
+        });
+
+    }
+};
+
 module.exports = {
     registerDevice,
-    getMyDevices
+    getMyDevices,
+    updateDeviceStatus
 };
