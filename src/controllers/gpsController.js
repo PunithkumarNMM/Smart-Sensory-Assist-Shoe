@@ -24,56 +24,45 @@ const updateLocation = async (req, res) => {
         }
 
         const location = await Location.create({
-
             deviceId,
             latitude,
             longitude,
             speed,
             accuracy
-
         });
 
         return res.status(201).json({
-
             success: true,
             message: "Location Updated Successfully",
             location
-
         });
 
     } catch (error) {
 
         return res.status(500).json({
-
             success: false,
             message: error.message
-
         });
 
     }
 
 };
 
-// Get Latest GPS Location
+// Latest Location
 const getLiveLocation = async (req, res) => {
 
     try {
 
         const { deviceId } = req.params;
 
-        const location = await Location.findOne({
-            deviceId
-        }).sort({
-            createdAt: -1
-        });
+        const location = await Location.findOne({ deviceId })
+            .sort({ createdAt: -1 });
 
         if (!location) {
 
             return res.status(404).json({
-
                 success: false,
                 message: "No location found"
-
             });
 
         }
@@ -81,7 +70,20 @@ const getLiveLocation = async (req, res) => {
         return res.status(200).json({
 
             success: true,
-            location
+
+            location: {
+
+                deviceId: location.deviceId,
+                latitude: location.latitude,
+                longitude: location.longitude,
+                speed: location.speed,
+                accuracy: location.accuracy,
+                updatedAt: location.updatedAt,
+
+                googleMapsUrl:
+                    `https://www.google.com/maps?q=${location.latitude},${location.longitude}`
+
+            }
 
         });
 
@@ -98,18 +100,15 @@ const getLiveLocation = async (req, res) => {
 
 };
 
-// Get Complete GPS History
+// GPS History
 const getLocationHistory = async (req, res) => {
 
     try {
 
         const { deviceId } = req.params;
 
-        const locations = await Location.find({
-            deviceId
-        }).sort({
-            createdAt: -1
-        });
+        const locations = await Location.find({ deviceId })
+            .sort({ createdAt: -1 });
 
         return res.status(200).json({
 
