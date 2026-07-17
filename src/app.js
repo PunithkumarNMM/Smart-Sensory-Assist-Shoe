@@ -12,6 +12,12 @@ const authRoutes = require("./routes/authRoutes");
 const protectedRoutes = require("./routes/protectedRoutes");
 const deviceRoutes = require("./routes/deviceRoutes");
 const gpsRoutes = require("./routes/gpsRoutes");
+const fallRoutes = require("./routes/fallRoutes");
+const sosRoutes = require("./routes/sosRoutes");
+const notificationRoutes = require("./routes/notificationRoutes");
+const dashboardRoutes = require("./routes/dashboardRoutes");
+const deviceStatusRoutes = require("./routes/deviceStatusRoutes");
+
 // Home Route
 app.get("/", (req, res) => {
   res.json({
@@ -26,5 +32,10 @@ app.use("/api/auth", authRoutes);
 app.use("/api", protectedRoutes);
 app.use("/api/device", deviceRoutes);
 app.use("/api/gps", gpsRoutes);
+app.use("/api/fall", fallRoutes);
+app.use("/api/sos", sosRoutes);
+app.use("/api/notifications", notificationRoutes);
+app.use("/api/dashboard", dashboardRoutes);
+app.use("/api/device/status", deviceStatusRoutes);
 
 module.exports = app;
