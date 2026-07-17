@@ -16,32 +16,23 @@ const registerDevice = async (req, res) => {
         }
 
         const device = await Device.create({
-
             deviceId: "SHOE-" + Date.now(),
-
             shoeName,
-
             esp32Mac,
-
             parentId: req.user.id
-
         });
 
         return res.status(201).json({
-
             success: true,
             message: "Device Registered Successfully",
             device
-
         });
 
     } catch (error) {
 
         return res.status(500).json({
-
             success: false,
             message: error.message
-
         });
 
     }
@@ -56,20 +47,104 @@ const getMyDevices = async (req, res) => {
         });
 
         return res.status(200).json({
-
             success: true,
             count: devices.length,
             devices
-
         });
 
     } catch (error) {
 
         return res.status(500).json({
-
             success: false,
             message: error.message
+        });
 
+    }
+};
+
+// Get a single device by Device ID
+const getDeviceById = async (req, res) => {
+    try {
+
+        const { deviceId } = req.params;
+
+        const device = await Device.findOne({
+            deviceId,
+            parentId: req.user.id
+        });
+
+        if (!device) {
+            return res.status(404).json({
+                success: false,
+                message: "Device not found"
+            });
+        }
+
+        return res.status(200).json({
+            success: true,
+            device
+        });
+
+    } catch (error) {
+
+        return res.status(500).json({
+            success: false,
+            message: error.message
+        });
+
+    }
+};
+
+// Update device details
+const updateDevice = async (req, res) => {
+    try {
+
+        const { deviceId } = req.params;
+
+        const {
+            shoeName,
+            firmwareVersion,
+            gpsEnabled,
+            cameraEnabled
+        } = req.body;
+
+        const device = await Device.findOne({
+            deviceId,
+            parentId: req.user.id
+        });
+
+        if (!device) {
+            return res.status(404).json({
+                success: false,
+                message: "Device not found"
+            });
+        }
+
+        if (shoeName !== undefined)
+            device.shoeName = shoeName;
+
+        if (firmwareVersion !== undefined)
+            device.firmwareVersion = firmwareVersion;
+
+        if (gpsEnabled !== undefined)
+            device.gpsEnabled = gpsEnabled;
+
+        if (cameraEnabled !== undefined)
+            device.cameraEnabled = cameraEnabled;
+
+        await device.save();
+
+        return res.status(200).json({
+            success: true,
+            message: "Device updated successfully",
+            device
+        });
+
+    } catch (error) {
+
+        return res.status(500).json({
+            success: false,
+            message: error.message
         });
 
     }
@@ -91,27 +166,60 @@ const updateDeviceStatus = async (req, res) => {
             });
         }
 
-        device.batteryLevel = batteryLevel;
-        device.status = status;
+        if (batteryLevel !== undefined)
+            device.batteryLevel = batteryLevel;
+
+        if (status)
+            device.status = status;
+
         device.lastSeen = new Date();
 
         await device.save();
 
         return res.status(200).json({
-
             success: true,
             message: "Device Status Updated Successfully",
             device
-
         });
 
     } catch (error) {
 
         return res.status(500).json({
-
             success: false,
             message: error.message
+        });
 
+    }
+};
+
+// Delete Device
+const deleteDevice = async (req, res) => {
+    try {
+
+        const { deviceId } = req.params;
+
+        const device = await Device.findOneAndDelete({
+            deviceId,
+            parentId: req.user.id
+        });
+
+        if (!device) {
+            return res.status(404).json({
+                success: false,
+                message: "Device not found"
+            });
+        }
+
+        return res.status(200).json({
+            success: true,
+            message: "Device deleted successfully"
+        });
+
+    } catch (error) {
+
+        return res.status(500).json({
+            success: false,
+            message: error.message
         });
 
     }
@@ -120,5 +228,8 @@ const updateDeviceStatus = async (req, res) => {
 module.exports = {
     registerDevice,
     getMyDevices,
-    updateDeviceStatus
+    getDeviceById,
+    updateDevice,
+    updateDeviceStatus,
+    deleteDevice
 };
