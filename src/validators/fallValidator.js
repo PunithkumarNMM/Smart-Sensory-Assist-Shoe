@@ -22,8 +22,8 @@ const fallEventValidation = [
 
     body("severity")
         .optional()
-        .isIn(["Low", "Medium", "High"])
-        .withMessage("Severity must be Low, Medium, or High")
+        .isIn(["LOW", "MEDIUM", "HIGH"])
+        .withMessage("Severity must be LOW, MEDIUM, or HIGH")
 ];
 
 module.exports = {
