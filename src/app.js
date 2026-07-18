@@ -6,6 +6,7 @@ const swaggerUi = require("swagger-ui-express");
 const app = express();
 
 // Import Middlewares
+const logger = require("./middleware/logger");
 const errorHandler = require("./middleware/errorHandler");
 const apiLimiter = require("./middleware/rateLimiter");
 
@@ -19,7 +20,10 @@ app.use(helmet());
 app.use(cors());
 app.use(express.json());
 
-// Apply Rate Limiter to all API routes
+// Logger Middleware
+app.use(logger);
+
+// Apply Rate Limiter
 app.use("/api", apiLimiter);
 
 // Import Routes
@@ -33,7 +37,6 @@ const notificationRoutes = require("./routes/notificationRoutes");
 const dashboardRoutes = require("./routes/dashboardRoutes");
 const deviceStatusRoutes = require("./routes/deviceStatusRoutes");
 const cameraRoutes = require("./routes/cameraRoutes");
-const logger = require("./middleware/logger");
 
 /**
  * @swagger
@@ -73,7 +76,6 @@ app.use("/api/notifications", notificationRoutes);
 app.use("/api/dashboard", dashboardRoutes);
 app.use("/api/device/status", deviceStatusRoutes);
 app.use("/api/camera", cameraRoutes);
-app.use(logger);
 
 // 404 Handler
 app.use((req, res) => {

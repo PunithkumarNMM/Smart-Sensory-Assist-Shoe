@@ -1,9 +1,22 @@
 const Device = require("../models/Device");
+const { getIO } = require("../socket/socket");
 
-// Update device status
+// ==============================
+// Update Device Status
+// ==============================
 const updateDeviceStatus = async (req, res) => {
   try {
-    const { deviceId, batteryLevel, status } = req.body;
+    console.log(">>> updateDeviceStatus called");
+
+    // Prevent crash if req.body is missing
+    const { deviceId, batteryLevel, status } = req.body || {};
+
+    if (!deviceId) {
+      return res.status(400).json({
+        success: false,
+        message: "deviceId is required",
+      });
+    }
 
     const device = await Device.findOne({ deviceId });
 
@@ -18,7 +31,7 @@ const updateDeviceStatus = async (req, res) => {
       device.batteryLevel = batteryLevel;
     }
 
-    if (status) {
+    if (status !== undefined) {
       device.status = status;
     }
 
@@ -26,13 +39,61 @@ const updateDeviceStatus = async (req, res) => {
 
     await device.save();
 
-    res.status(200).json({
+    const io = getIO();
+
+    io.emit("device:status", {
+      deviceId: device.deviceId,
+      batteryLevel: device.batteryLevel,
+      status: device.status,
+      lastSeen: device.lastSeen,
+    });
+
+    console.log("🔋 Device Status Emitted");
+
+    return res.status(200).json({
       success: true,
       message: "Device status updated successfully",
       data: device,
     });
+
   } catch (error) {
-    res.status(500).json({
+    return res.status(500).json({
+      success: false,
+      message: error.message,
+    });
+  }
+};
+
+// ==============================
+// Get Device Status
+// ==============================
+const getDeviceStatus = async (req, res) => {
+  try {
+    console.log(">>> getDeviceStatus called");
+
+    const { deviceId } = req.params;
+
+    const device = await Device.findOne({ deviceId });
+
+    if (!device) {
+      return res.status(404).json({
+        success: false,
+        message: "Device not found",
+      });
+    }
+
+    return res.status(200).json({
+      success: true,
+      data: {
+        deviceId: device.deviceId,
+        batteryLevel: device.batteryLevel,
+        status: device.status,
+        lastSeen: device.lastSeen,
+      },
+    });
+
+  } catch (error) {
+    return res.status(500).json({
       success: false,
       message: error.message,
     });
@@ -41,4 +102,5 @@ const updateDeviceStatus = async (req, res) => {
 
 module.exports = {
   updateDeviceStatus,
+  getDeviceStatus,
 };
