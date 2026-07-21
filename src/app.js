@@ -90,6 +90,7 @@ app.use("/api/dashboard", dashboardRoutes);
 app.use("/api/device/status", deviceStatusRoutes);
 
 app.use("/api/camera", cameraRoutes);
+app.use("/api/camera", cameraUploadRoutes);
 
 // ✅ Activity Analytics Routes
 app.use("/api/activity", activityRoutes);
