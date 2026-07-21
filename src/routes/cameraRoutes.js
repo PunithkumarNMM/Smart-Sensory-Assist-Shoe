@@ -1,82 +1,116 @@
 const express = require("express");
 const router = express.Router();
 
-const authMiddleware = require("../middleware/authMiddleware");
+let latestFrame = null;
+let lastUpdate = 0;
 
-const {
-    getCameraStatus,
-    startCamera,
-    stopCamera,
-} = require("../controllers/cameraController");
+/*
+====================================
+UPLOAD FRAME FROM ESP32
+====================================
+*/
 
-/**
- * @swagger
- * tags:
- *   name: Camera
- *   description: Camera Control APIs
- */
-
-/**
- * @swagger
- * /api/camera/status:
- *   get:
- *     summary: Get camera status
- *     description: Returns the current status of the smart shoe camera.
- *     tags: [Camera]
- *     security:
- *       - bearerAuth: []
- *     responses:
- *       200:
- *         description: Camera status retrieved successfully
- *       401:
- *         description: Unauthorized
- */
-router.get(
-    "/status",
-    authMiddleware,
-    getCameraStatus
-);
-
-/**
- * @swagger
- * /api/camera/start:
- *   post:
- *     summary: Start camera
- *     description: Starts the smart shoe camera for monitoring or live streaming.
- *     tags: [Camera]
- *     security:
- *       - bearerAuth: []
- *     responses:
- *       200:
- *         description: Camera started successfully
- *       401:
- *         description: Unauthorized
- */
 router.post(
-    "/start",
-    authMiddleware,
-    startCamera
+    "/upload",
+    express.raw({
+        type: "image/jpeg",
+        limit: "20mb"
+    }),
+    (req, res) => {
+
+        if (!req.body || req.body.length === 0) {
+            return res.status(400).json({
+                success: false,
+                message: "No image received"
+            });
+        }
+
+        latestFrame = req.body;
+        lastUpdate = Date.now();
+
+        console.log(
+            "Frame Received:",
+            latestFrame.length,
+            "bytes"
+        );
+
+        res.json({
+            success: true,
+            time: lastUpdate
+        });
+
+    }
 );
 
-/**
- * @swagger
- * /api/camera/stop:
- *   post:
- *     summary: Stop camera
- *     description: Stops the smart shoe camera.
- *     tags: [Camera]
- *     security:
- *       - bearerAuth: []
- *     responses:
- *       200:
- *         description: Camera stopped successfully
- *       401:
- *         description: Unauthorized
- */
-router.post(
-    "/stop",
-    authMiddleware,
-    stopCamera
-);
+/*
+====================================
+LIVE CAMERA
+====================================
+*/
+
+router.get("/latest", (req, res) => {
+
+    if (!latestFrame) {
+
+        return res.status(404).send("No image available");
+
+    }
+
+    res.setHeader("Content-Type", "image/jpeg");
+    res.setHeader("Cache-Control", "no-cache");
+    res.setHeader("Pragma", "no-cache");
+    res.send(latestFrame);
+
+});
+
+/*
+====================================
+CAMERA STATUS
+====================================
+*/
+
+router.get("/status", (req, res) => {
+
+    const online =
+        Date.now() - lastUpdate < 10000;
+
+    res.json({
+
+        online,
+
+        lastUpdate
+
+    });
+
+});
+
+/*
+====================================
+CAPTURE
+====================================
+*/
+
+router.get("/capture", (req, res) => {
+
+    if (!latestFrame) {
+
+        return res.status(404).json({
+
+            success: false,
+
+            message: "No image"
+
+        });
+
+    }
+
+    res.setHeader(
+        "Content-Type",
+        "image/jpeg"
+    );
+
+    res.send(latestFrame);
+
+});
 
 module.exports = router;
