@@ -1,4 +1,5 @@
 const Device = require("../models/Device");
+const { getIO } = require("../socket/socket");
 
 // Register a new Smart Shoe
 const registerDevice = async (req, res) => {
@@ -175,6 +176,15 @@ const updateDeviceStatus = async (req, res) => {
         device.lastSeen = new Date();
 
         await device.save();
+        // Emit Live Device Status
+const io = getIO();
+
+io.emit("device:status", {
+    deviceId: device.deviceId,
+    status: device.status,
+    batteryLevel: device.batteryLevel,
+    lastSeen: device.lastSeen
+});
 
         return res.status(200).json({
             success: true,

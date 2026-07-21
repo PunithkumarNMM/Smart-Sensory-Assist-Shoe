@@ -1,5 +1,6 @@
 const Location = require("../models/Location");
 const Device = require("../models/Device");
+const { getIO } = require("../socket/socket");
 
 // Update GPS Location
 const updateLocation = async (req, res) => {
@@ -31,6 +32,20 @@ const updateLocation = async (req, res) => {
             speed,
             accuracy
 
+        });
+
+        // ==========================
+        // SOCKET.IO LIVE GPS UPDATE
+        // ==========================
+        const io = getIO();
+
+        io.emit("gps:update", {
+            deviceId,
+            latitude,
+            longitude,
+            speed,
+            accuracy,
+            timestamp: location.createdAt
         });
 
         return res.status(201).json({
