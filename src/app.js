@@ -37,6 +37,10 @@ const notificationRoutes = require("./routes/notificationRoutes");
 const dashboardRoutes = require("./routes/dashboardRoutes");
 const deviceStatusRoutes = require("./routes/deviceStatusRoutes");
 const cameraRoutes = require("./routes/cameraRoutes");
+const activityRoutes = require("./routes/activityRoutes");
+const childRoutes = require("./routes/childRoutes");
+const aiRoutes = require("./routes/aiRoutes");
+const cameraUploadRoutes = require("./routes/cameraUpload");
 
 /**
  * @swagger
@@ -65,17 +69,35 @@ app.use(
     swaggerUi.setup(swaggerSpec)
 );
 
-// API Routes
+// ================= API Routes =================
+
 app.use("/api/auth", authRoutes);
+
 app.use("/api", protectedRoutes);
+
 app.use("/api/device", deviceRoutes);
+
 app.use("/api/gps", gpsRoutes);
+
 app.use("/api/fall", fallRoutes);
+
 app.use("/api/sos", sosRoutes);
+
 app.use("/api/notifications", notificationRoutes);
+
 app.use("/api/dashboard", dashboardRoutes);
+
 app.use("/api/device/status", deviceStatusRoutes);
+
 app.use("/api/camera", cameraRoutes);
+
+// ✅ Activity Analytics Routes
+app.use("/api/activity", activityRoutes);
+// ✅ Child Profile Routes
+app.use("/api/child", childRoutes);
+app.use("/api/ai", aiRoutes);
+
+// ==============================================
 
 // 404 Handler
 app.use((req, res) => {
