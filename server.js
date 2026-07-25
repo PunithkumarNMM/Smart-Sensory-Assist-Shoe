@@ -22,6 +22,7 @@ const io = new Server(server, {
         methods: ["GET", "POST", "PUT", "PATCH", "DELETE"]
     }
 });
+global.io = io;
 
 // Initialize Socket Manager
 initializeSocket(io);
