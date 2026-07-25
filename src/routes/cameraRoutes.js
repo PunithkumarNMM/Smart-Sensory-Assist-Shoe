@@ -17,6 +17,7 @@ router.post(
         limit: "20mb"
     }),
     (req, res) => {
+        console.log(">>> Upload request received");
 
         if (!req.body || req.body.length === 0) {
             return res.status(400).json({
