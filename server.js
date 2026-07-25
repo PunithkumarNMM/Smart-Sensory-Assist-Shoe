@@ -36,11 +36,11 @@ io.on("connection", (socket) => {
 });
 
 // Start Server
-server.listen(PORT, () => {
+server.listen(PORT, "0.0.0.0", () => {
     console.log("==================================");
     console.log(" Smart Sensory Assist Shoe Server ");
     console.log("==================================");
-    console.log(`🚀 Server Running : http://localhost:${PORT}`);
-    console.log(`📘 Swagger Docs  : http://localhost:${PORT}/api-docs`);
+    console.log(`🚀 Server Running on Port ${PORT}`);
+    console.log(`📘 Swagger Docs : /api-docs`);
     console.log("✅ Socket.IO Initialized");
 });
