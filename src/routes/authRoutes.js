@@ -1,10 +1,7 @@
 const express = require("express");
 const router = express.Router();
 
-const {
-    register,
-    login
-} = require("../controllers/authController");
+const authController = require("../controllers/authController");
 
 const {
     registerValidation,
@@ -13,85 +10,32 @@ const {
 
 const validate = require("../middleware/validationMiddleware");
 
-/**
- * @swagger
- * tags:
- *   name: Authentication
- *   description: User Authentication APIs
- */
+// Debug (remove later)
+console.log(authController);
 
-/**
- * @swagger
- * /api/auth/register:
- *   post:
- *     summary: Register a new user
- *     tags: [Authentication]
- *     requestBody:
- *       required: true
- *       content:
- *         application/json:
- *           schema:
- *             type: object
- *             required:
- *               - name
- *               - email
- *               - password
- *             properties:
- *               name:
- *                 type: string
- *                 example: Punith Kumar
- *               email:
- *                 type: string
- *                 example: punith@gmail.com
- *               password:
- *                 type: string
- *                 example: Password@123
- *     responses:
- *       201:
- *         description: User registered successfully
- *       400:
- *         description: Validation error
- */
+// ================= REGISTER =================
+
 router.post(
     "/register",
     registerValidation,
     validate,
-    register
+    authController.register
 );
 
-/**
- * @swagger
- * /api/auth/login:
- *   post:
- *     summary: Login user
- *     tags: [Authentication]
- *     requestBody:
- *       required: true
- *       content:
- *         application/json:
- *           schema:
- *             type: object
- *             required:
- *               - email
- *               - password
- *             properties:
- *               email:
- *                 type: string
- *                 example: punith@gmail.com
- *               password:
- *                 type: string
- *                 example: Password@123
- *     responses:
- *       200:
- *         description: Login successful
- *       400:
- *         description: Invalid credentials
- */
+// ================= LOGIN =================
+
 router.post(
     "/login",
     loginValidation,
     validate,
-    login
+    authController.login
+);
+
+// ================= FORGOT PASSWORD =================
+
+router.post(
+    "/forgot-password",
+    authController.forgotPassword
 );
 
 module.exports = router;

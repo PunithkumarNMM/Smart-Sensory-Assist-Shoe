@@ -26,19 +26,27 @@ router.post(
             });
         }
 
-        latestFrame = req.body;
-        lastUpdate = Date.now();
+       latestFrame = req.body;
+lastUpdate = Date.now();
 
-        console.log(
-            "Frame Received:",
-            latestFrame.length,
-            "bytes"
-        );
+console.log(
+    "Frame Received:",
+    latestFrame.length,
+    "bytes"
+);
 
-        res.json({
-            success: true,
-            time: lastUpdate
-        });
+// Broadcast frame to all connected clients
+if (global.io) {
+    global.io.emit("newFrame", {
+        timestamp: lastUpdate,
+        image: latestFrame.toString("base64")
+    });
+}
+
+res.json({
+    success: true,
+    time: lastUpdate
+});
 
     }
 );
