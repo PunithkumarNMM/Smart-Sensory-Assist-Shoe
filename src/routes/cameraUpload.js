@@ -26,7 +26,14 @@ router.post(
 
     console.log(`✅ Image received: ${latestImage.length} bytes`);
 
-    res.status(200).json({
+    // Notify all connected Android apps
+    if (global.io) {
+      global.io.emit("newImage", {
+        timestamp: Date.now(),
+      });
+    }
+
+    return res.status(200).json({
       success: true,
       message: "Image uploaded successfully",
       size: latestImage.length,

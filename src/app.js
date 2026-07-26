@@ -60,7 +60,7 @@ const sosRoutes = require("./routes/sosRoutes");
 const notificationRoutes = require("./routes/notificationRoutes");
 const dashboardRoutes = require("./routes/dashboardRoutes");
 const deviceStatusRoutes = require("./routes/deviceStatusRoutes");
-const cameraRoutes = require("./routes/cameraRoutes");
+const cameraUpload = require("./routes/cameraUpload");
 const activityRoutes = require("./routes/activityRoutes");
 const childRoutes = require("./routes/childRoutes");
 const aiRoutes = require("./routes/aiRoutes");
@@ -115,7 +115,7 @@ app.use("/api/dashboard", dashboardRoutes);
 
 app.use("/api/device/status", deviceStatusRoutes);
 
-app.use("/api/camera", cameraRoutes);
+app.use("/api/camera", cameraUpload);
 
 app.use("/api/activity", activityRoutes);
 
