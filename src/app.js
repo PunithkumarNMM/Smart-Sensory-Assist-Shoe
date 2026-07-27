@@ -64,6 +64,7 @@ const cameraUpload = require("./routes/cameraUpload");
 const activityRoutes = require("./routes/activityRoutes");
 const childRoutes = require("./routes/childRoutes");
 const aiRoutes = require("./routes/aiRoutes");
+const guardianRoutes = require("./routes/guardianRoutes");
 
 // ===============================
 // Home Route
@@ -122,6 +123,7 @@ app.use("/api/activity", activityRoutes);
 app.use("/api/child", childRoutes);
 
 app.use("/api/ai", aiRoutes);
+app.use("/api/guardians", guardianRoutes);
 
 // ===============================
 // 404 Handler
