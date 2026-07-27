@@ -2,9 +2,13 @@ const SOSEvent = require("../models/SOSEvent");
 const Notification = require("../models/Notification");
 const { getIO } = require("../socket/socket");
 
+// ============================
 // Create SOS Event
+// ============================
 const createSOSEvent = async (req, res) => {
   try {
+
+    const io = getIO();
 
     const sosEvent = new SOSEvent(req.body);
     await sosEvent.save();
@@ -18,10 +22,15 @@ const createSOSEvent = async (req, res) => {
 
     await notification.save();
 
-    // ==============================
-    // Emit Real-Time SOS Alert
-    // ==============================
-    const io = getIO();
+    io.emit("notification:created", {
+      _id: notification._id,
+      deviceId: notification.deviceId,
+      title: notification.title,
+      message: notification.message,
+      type: notification.type,
+      isRead: notification.isRead,
+      createdAt: notification.createdAt,
+    });
 
     io.emit("sos:created", {
       id: sosEvent._id,
@@ -50,17 +59,22 @@ const createSOSEvent = async (req, res) => {
   }
 };
 
+// ============================
 // Get SOS History
+// ============================
 const getSOSHistory = async (req, res) => {
+
   try {
 
-    const sosEvents = await SOSEvent.find({
+    const history = await SOSEvent.find({
       deviceId: req.params.deviceId,
-    }).sort({ createdAt: -1 });
+    })
+      .sort({ createdAt: -1 });
 
     res.status(200).json({
       success: true,
-      data: sosEvents,
+      count: history.length,
+      data: history,
     });
 
   } catch (error) {
@@ -71,6 +85,7 @@ const getSOSHistory = async (req, res) => {
     });
 
   }
+
 };
 
 module.exports = {
