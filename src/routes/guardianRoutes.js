@@ -7,6 +7,7 @@ const authMiddleware = require("../middleware/authMiddleware");
 const {
   addGuardian,
   getGuardians,
+  getGuardianById,
   updateGuardian,
   deleteGuardian,
 } = require("../controllers/guardianController");
@@ -25,6 +26,13 @@ router.get(
   getGuardians
 );
 
+// Get Guardian By ID
+router.get(
+  "/:id",
+  authMiddleware,
+  getGuardianById
+);
+
 // Update Guardian
 router.put(
   "/:id",
@@ -38,6 +46,5 @@ router.delete(
   authMiddleware,
   deleteGuardian
 );
-router.get("/:id", protect, getGuardianById);
 
 module.exports = router;
