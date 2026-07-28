@@ -26,10 +26,15 @@ const userSchema = new mongoose.Schema(
         required: true
     },
 
-    role: {
-        type: String,
-        default: "parent"
-    }
+  role: {
+    type: String,
+    default: "parent"
+},
+
+profileImage: {
+    type: String,
+    default: ""
+}
 },
 {
     timestamps: true
