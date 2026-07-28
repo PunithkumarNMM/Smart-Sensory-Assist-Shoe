@@ -2,11 +2,17 @@ const express = require("express");
 const router = express.Router();
 
 const authController = require("../controllers/authController");
-
+const authMiddleware = require("../middleware/authMiddleware");
 const {
     registerValidation,
     loginValidation
 } = require("../validators/authValidator");
+const {
+    register,
+    login,
+    forgotPassword,
+    getProfile
+} = require("../controllers/authController");
 
 const validate = require("../middleware/validationMiddleware");
 
@@ -36,6 +42,11 @@ router.post(
 router.post(
     "/forgot-password",
     authController.forgotPassword
+);
+router.get(
+    "/profile",
+    authMiddleware,
+    getProfile
 );
 
 module.exports = router;
