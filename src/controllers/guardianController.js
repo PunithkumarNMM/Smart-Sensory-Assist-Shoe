@@ -145,10 +145,42 @@ const deleteGuardian = async (req, res) => {
   }
 
 };
+const getGuardianById = async (req, res) => {
+
+    try {
+
+        const guardian = await Guardian.findOne({
+            _id: req.params.id,
+            userId: req.user.id
+        });
+
+        if (!guardian) {
+            return res.status(404).json({
+                success: false,
+                message: "Guardian not found"
+            });
+        }
+
+        res.json({
+            success: true,
+            data: guardian
+        });
+
+    } catch (error) {
+
+        res.status(500).json({
+            success: false,
+            message: error.message
+        });
+
+    }
+
+};
 
 module.exports = {
-  addGuardian,
-  getGuardians,
-  updateGuardian,
-  deleteGuardian,
+    addGuardian,
+    getGuardians,
+    getGuardianById,
+    updateGuardian,
+    deleteGuardian
 };

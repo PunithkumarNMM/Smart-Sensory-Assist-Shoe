@@ -38,5 +38,6 @@ router.delete(
   authMiddleware,
   deleteGuardian
 );
+router.get("/:id", protect, getGuardianById);
 
 module.exports = router;
