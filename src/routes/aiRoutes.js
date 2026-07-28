@@ -1,22 +1,27 @@
 const express = require("express");
-
-const {
-  getLatestAnalysis,
-  analyzeData,
-  getHistory,
-} = require("../controllers/aiController");
-
+const router = express.Router();
 const authMiddleware = require("../middleware/authMiddleware");
 
-const router = express.Router();
+router.post("/detect", authMiddleware, async (req, res) => {
 
-// Get latest AI analysis
-router.get("/latest", authMiddleware, getLatestAnalysis);
+    const { prediction, confidence } = req.body;
 
-// Save AI analysis
-router.post("/analyze", authMiddleware, analyzeData);
+    let emergency = false;
 
-// Get AI history
-router.get("/history", authMiddleware, getHistory);
+    if (
+        prediction === "fall" &&
+        confidence >= 0.80
+    ) {
+        emergency = true;
+    }
+
+    res.json({
+        success: true,
+        prediction,
+        confidence,
+        emergency
+    });
+
+});
 
 module.exports = router;
