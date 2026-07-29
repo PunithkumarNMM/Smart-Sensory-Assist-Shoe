@@ -3,6 +3,7 @@ const router = express.Router();
 
 const authController = require("../controllers/authController");
 const authMiddleware = require("../middleware/authMiddleware");
+const upload = require("../middleware/uploadMiddleware");
 const {
     registerValidation,
     loginValidation
@@ -13,7 +14,9 @@ const {
     login,
     forgotPassword,
     getProfile,
-    updateProfile
+    updateProfile,
+    changePassword,
+    uploadProfileImage
 } = require("../controllers/authController");
 
 const validate = require("../middleware/validationMiddleware");
@@ -59,6 +62,12 @@ router.put(
     "/change-password",
     authMiddleware,
     authController.changePassword
+);
+router.post(
+    "/upload-profile-image",
+    authMiddleware,
+    upload.single("image"),
+    authController.uploadProfileImage
 );
 
 module.exports = router;
