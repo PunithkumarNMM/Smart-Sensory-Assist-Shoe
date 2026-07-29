@@ -1,6 +1,7 @@
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
 const User = require("../models/User");
+const cloudinary = require("../config/cloudinary");
 
 // ================= LOGIN =================
 
@@ -203,6 +204,45 @@ const updateProfile = async (req, res) => {
     }
 
 };
+const uploadProfileImage = async (req, res) => {
+
+    try {
+
+        if (!req.file) {
+            return res.status(400).json({
+                success: false,
+                message: "No image uploaded"
+            });
+        }
+
+        const base64Image = `data:${req.file.mimetype};base64,${req.file.buffer.toString("base64")}`;
+
+        const result = await cloudinary.uploader.upload(base64Image, {
+            folder: "smartshoe/profile-images"
+        });
+
+        const user = await User.findById(req.user.id);
+
+        user.profileImage = result.secure_url;
+
+        await user.save();
+
+        res.json({
+            success: true,
+            message: "Profile image uploaded successfully",
+            imageUrl: result.secure_url
+        });
+
+    } catch (error) {
+
+        res.status(500).json({
+            success: false,
+            message: error.message
+        });
+
+    }
+
+};
 const changePassword = async (req, res) => {
 
     try {
@@ -256,5 +296,6 @@ module.exports = {
     forgotPassword,
     getProfile,
     updateProfile,
-    changePassword
+    changePassword,
+    uploadProfileImage
 };
