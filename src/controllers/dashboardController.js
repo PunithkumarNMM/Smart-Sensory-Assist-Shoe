@@ -33,11 +33,11 @@ const user = device
     res.status(200).json({
   success: true,
   data: {
-    name: device?.ownerName || "",
-    email: device?.ownerEmail || "",
-    profileImage: device?.profileImage || "",
-    deviceStatus: device ? "Connected" : "Disconnected",
-    battery: device?.battery || 0,
+    name: user?.name || "",
+    email: user?.email || "",
+    profileImage: user?.profileImage || "",
+    deviceStatus: device?.status || "Offline",
+    battery: device?.batteryLevel || 0,
     lastSync: device?.updatedAt || "",
     location: latestLocation
       ? `${latestLocation.latitude}, ${latestLocation.longitude}`
