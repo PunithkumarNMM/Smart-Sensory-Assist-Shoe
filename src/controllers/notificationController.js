@@ -1,5 +1,9 @@
 const Notification = require("../models/Notification");
-
+const emitNotification = (notification) => {
+    if (global.io) {
+        global.io.emit("notification:created", notification);
+    }
+};
 // Get all notifications
 const getNotifications = async (req, res) => {
   try {
@@ -27,6 +31,7 @@ const markNotificationAsRead = async (req, res) => {
       { isRead: true },
       { new: true }
     );
+    emitNotification(notification);
 
     if (!notification) {
       return res.status(404).json({
@@ -71,7 +76,7 @@ const deleteNotification = async (req, res) => {
     const notification = await Notification.findByIdAndDelete(
       req.params.id
     );
-
+emitNotification(notification);
     if (!notification) {
       return res.status(404).json({
         success: false,
