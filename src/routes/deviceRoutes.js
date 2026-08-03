@@ -10,7 +10,8 @@ const {
     getDeviceById,
     updateDevice,
     updateDeviceStatus,
-    deleteDevice
+    deleteDevice,
+    getDeviceStatus
 } = require("../controllers/deviceController");
 
 const {
@@ -207,6 +208,11 @@ router.delete(
     "/:deviceId",
     authMiddleware,
     deleteDevice
+);
+router.get(
+    "/status/:deviceId",
+    authMiddleware,
+    getDeviceStatus
 );
 
 module.exports = router;
