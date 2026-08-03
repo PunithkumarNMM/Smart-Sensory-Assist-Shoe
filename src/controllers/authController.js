@@ -206,7 +206,8 @@ const updateProfile = async (req, res) => {
 
 };
 const uploadProfileImage = async (req, res) => {
-    console.log("🔥 uploadProfileImage called");
+console.log("🔥 uploadProfileImage called");
+console.log(req.file);
 
     try {
 
