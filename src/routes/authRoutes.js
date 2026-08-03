@@ -5,6 +5,7 @@ const authController = require("../controllers/authController");
 const authMiddleware = require("../middleware/authMiddleware");
 const upload = require("../middleware/uploadMiddleware");
 require("dotenv").config();
+console.log("🔥 authRoutes loaded");
 
 const express = require("express");
 const cors = require("cors");
