@@ -220,7 +220,17 @@ const uploadProfileImage = async (req, res) => {
 
         console.log("📤 Uploading to Cloudinary...");
 
-        const base64Image = `data:${req.file.mimetype};base64,${req.file.buffer.toString("base64")}`;
+       const mime =
+
+    req.file.mimetype === "image/*"
+
+        ? "image/jpeg"
+
+        : req.file.mimetype;
+
+const base64Image =
+
+    `data:${mime};base64,${req.file.buffer.toString("base64")}`;
 
         const result = await cloudinary.uploader.upload(base64Image, {
             folder: "smartshoe/profile-images"
