@@ -234,6 +234,55 @@ const deleteDevice = async (req, res) => {
 
     }
 };
+const getDeviceStatus = async (req, res) => {
+
+    try {
+
+        const { deviceId } = req.params;
+
+        const device = await Device.findOne({ deviceId });
+
+        if (!device) {
+
+            return res.status(404).json({
+                success: false,
+                message: "Device not found"
+            });
+
+        }
+
+        res.json({
+
+            success: true,
+
+            data: {
+
+                deviceId: device.deviceId,
+                shoeName: device.shoeName,
+                battery: device.batteryLevel,
+                status: device.status,
+                firmware: device.firmwareVersion,
+                gps: device.gpsEnabled,
+                camera: device.cameraEnabled,
+                lastSeen: device.lastSeen,
+                mac: device.esp32Mac
+
+            }
+
+        });
+
+    } catch (e) {
+
+        res.status(500).json({
+
+            success: false,
+            message: e.message
+
+        });
+
+    }
+
+};
 
 module.exports = {
     registerDevice,
@@ -241,5 +290,6 @@ module.exports = {
     getDeviceById,
     updateDevice,
     updateDeviceStatus,
-    deleteDevice
+    deleteDevice,
+    getDeviceStatus
 };
