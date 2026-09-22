@@ -65,6 +65,7 @@ const activityRoutes = require("./routes/activityRoutes");
 const childRoutes = require("./routes/childRoutes");
 const aiRoutes = require("./routes/aiRoutes");
 const guardianRoutes = require("./routes/guardianRoutes");
+const geofenceRoutes = require("./routes/geofenceRoutes");
 
 // ===============================
 // Home Route
@@ -124,6 +125,7 @@ app.use("/api/child", childRoutes);
 
 app.use("/api/ai", aiRoutes);
 app.use("/api/guardians", guardianRoutes);
+app.use("/api/geofences", geofenceRoutes);
 
 // ===============================
 // 404 Handler
