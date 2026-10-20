@@ -26,15 +26,28 @@ const userSchema = new mongoose.Schema(
         required: true
     },
 
-  role: {
-    type: String,
-    default: "parent"
-},
+    role: {
+        type: String,
+        default: "parent"
+    },
 
-profileImage: {
-    type: String,
-    default: ""
-}
+    profileImage: {
+        type: String,
+        default: ""
+    },
+
+    // --- NEW FIELDS FOR SMART SHOE SOS ---
+    deviceId: {
+        type: String,
+        default: "",
+        unique: true,
+        sparse: true // Allows users without a shoe device to register without unique conflict
+    },
+
+    fcmToken: {
+        type: String,
+        default: ""
+    }
 },
 {
     timestamps: true

@@ -7,7 +7,6 @@ const cloudinary = require("../config/cloudinary");
 
 const login = async (req, res) => {
     try {
-
         const { email, password } = req.body;
 
         const user = await User.findOne({ email });
@@ -47,32 +46,28 @@ const login = async (req, res) => {
             success: true,
             message: "Login Successful",
             token,
-           user: {
-    id: user._id,
-    name: user.name,
-    email: user.email,
-    phone: user.phone,
-    role: user.role,
-    profileImage: user.profileImage
-}
+            user: {
+                id: user._id,
+                name: user.name,
+                email: user.email,
+                phone: user.phone,
+                role: user.role,
+                profileImage: user.profileImage
+            }
         });
 
     } catch (error) {
-
         return res.status(500).json({
             success: false,
             message: error.message
         });
-
     }
 };
 
 // ================= REGISTER =================
 
 const register = async (req, res) => {
-
     try {
-
         const { name, email, phone, password } = req.body;
 
         const existingUser = await User.findOne({
@@ -102,21 +97,17 @@ const register = async (req, res) => {
         });
 
     } catch (error) {
-
         return res.status(500).json({
             success: false,
             message: error.message
         });
-
     }
 };
 
 // ================= FORGOT PASSWORD =================
 
 const forgotPassword = async (req, res) => {
-
     try {
-
         const { email, newPassword } = req.body;
 
         const user = await User.findOne({ email });
@@ -140,18 +131,15 @@ const forgotPassword = async (req, res) => {
         });
 
     } catch (error) {
-
         return res.status(500).json({
             success: false,
             message: error.message
         });
-
     }
 };
+
 const getProfile = async (req, res) => {
-
     try {
-
         const user = await User.findById(req.user.id).select("-password");
 
         res.status(200).json({
@@ -160,19 +148,15 @@ const getProfile = async (req, res) => {
         });
 
     } catch (error) {
-
         res.status(500).json({
             success: false,
             message: error.message
         });
-
     }
-
 };
+
 const updateProfile = async (req, res) => {
-
     try {
-
         const { name, email } = req.body;
 
         const user = await User.findById(req.user.id);
@@ -196,19 +180,15 @@ const updateProfile = async (req, res) => {
         });
 
     } catch (error) {
-
         res.status(500).json({
             success: false,
             message: error.message
         });
-
     }
-
 };
+
 const uploadProfileImage = async (req, res) => {
-
     try {
-
         console.log("🔥 uploadProfileImage called");
 
         if (!req.file) {
@@ -220,17 +200,13 @@ const uploadProfileImage = async (req, res) => {
 
         console.log("📤 Uploading to Cloudinary...");
 
-       const mime =
+        const mime =
+            req.file.mimetype === "image/*"
+                ? "image/jpeg"
+                : req.file.mimetype;
 
-    req.file.mimetype === "image/*"
-
-        ? "image/jpeg"
-
-        : req.file.mimetype;
-
-const base64Image =
-
-    `data:${mime};base64,${req.file.buffer.toString("base64")}`;
+        const base64Image =
+            `data:${mime};base64,${req.file.buffer.toString("base64")}`;
 
         const result = await cloudinary.uploader.upload(base64Image, {
             folder: "smartshoe/profile-images"
@@ -256,7 +232,6 @@ const base64Image =
         });
 
     } catch (error) {
-
         console.error("❌ FULL ERROR:");
         console.error(error);
 
@@ -264,14 +239,11 @@ const base64Image =
             success: false,
             message: error.message
         });
-
     }
-
 };
+
 const changePassword = async (req, res) => {
-
     try {
-
         const { currentPassword, newPassword } = req.body;
 
         const user = await User.findById(req.user.id);
@@ -305,14 +277,48 @@ const changePassword = async (req, res) => {
         });
 
     } catch (error) {
-
         res.status(500).json({
             success: false,
             message: error.message
         });
-
     }
+};
 
+// ================= UPDATE DEVICE & FCM TOKEN =================
+
+const updateDevice = async (req, res) => {
+    try {
+        const { deviceId, fcmToken } = req.body;
+        const userId = req.user.id; // Extracted from JWT token by authMiddleware
+
+        const updatedUser = await User.findByIdAndUpdate(
+            userId,
+            { deviceId, fcmToken },
+            { new: true }
+        );
+
+        if (!updatedUser) {
+            return res.status(404).json({
+                success: false,
+                message: "User not found"
+            });
+        }
+
+        return res.status(200).json({
+            success: true,
+            message: "Device ID and FCM Token linked successfully!",
+            data: {
+                email: updatedUser.email,
+                deviceId: updatedUser.deviceId
+            }
+        });
+
+    } catch (error) {
+        return res.status(500).json({
+            success: false,
+            message: error.message
+        });
+    }
 };
 
 module.exports = {
@@ -322,5 +328,6 @@ module.exports = {
     getProfile,
     updateProfile,
     changePassword,
-    uploadProfileImage
+    uploadProfileImage,
+    updateDevice
 };

@@ -37,7 +37,7 @@ router.post(
     authController.forgotPassword
 );
 
-// ================= PROFILE =================
+// ================= PROFILE & DEVICE SYNC =================
 
 router.get(
     "/profile",
@@ -62,6 +62,13 @@ router.post(
     authMiddleware,
     upload.single("image"),
     authController.uploadProfileImage
+);
+
+// 👉 NEW: Route to sync Android App's Device ID & FCM Token to MongoDB
+router.put(
+    "/update-device",
+    authMiddleware,
+    authController.updateDevice
 );
 
 module.exports = router;
