@@ -15,4 +15,5 @@ Thumbs.db
 .vscode/
 .env
 
+/src/config/firebase-service-account.json
 src/config/serviceAccountKey.json

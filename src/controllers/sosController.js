@@ -1,6 +1,6 @@
 const User = require("../models/User"); 
 const axios = require("axios");
-const admin = require("../config/firebaseAdmin");
+const admin = require("../config/firebase");
 
 const createSOSEvent = async (req, res) => {
     try {

@@ -1,18 +1,30 @@
+
 const admin = require("firebase-admin");
+const path = require("path");
 
-// Option A: Using a service account JSON file from Firebase Console
-// (Download your service account JSON from Firebase Console -> Project Settings -> Service Accounts, 
-// place it in your backend folder, and name it 'serviceAccountKey.json')
 try {
-    const serviceAccount = require("../config/serviceAccountKey.json");
+    if (admin.getApps().length === 0) {
+        const serviceAccountPath =
+            process.env.FIREBASE_SERVICE_ACCOUNT ||
+            "./src/config/firebase-service-account.json";
 
-    admin.initializeApp({
-        credential: admin.credential.cert(serviceAccount)
-    });
+        const resolvedPath = path.resolve(serviceAccountPath);
+        const serviceAccount = require(resolvedPath);
 
-    console.log("[FIREBASE] Admin SDK initialized successfully");
+        const { cert, applicationDefault } = admin;
+
+        admin.initializeApp({
+            credential: cert
+                ? cert(serviceAccount)
+                : applicationDefault()
+        });
+
+        console.log("[FIREBASE] Admin SDK initialized successfully");
+    } else {
+        console.log("[FIREBASE] Admin SDK already initialized");
+    }
 } catch (error) {
-    console.error("[FIREBASE ERROR] Failed to initialize Firebase Admin. Make sure serviceAccountKey.json exists.", error.message);
+    console.error("[FIREBASE ERROR]", error.message);
 }
 
 module.exports = admin;
