@@ -1,5 +1,5 @@
 require("dotenv").config();
-require("./src/config/firebaseAdmin");
+require("./src/config/firebase");
 const http = require("http");
 const { Server } = require("socket.io");
 
