@@ -2,11 +2,13 @@
 const Device = require("../models/Device");
 const FallEvent = require("../models/FallEvent");
 const Notification = require("../models/Notification");
+const User = require("../models/User");
+const admin = require("../config/firebase");
 const { getIO } = require("../socket/socket");
 
 const receiveDeviceEvent = async (req, res) => {
     try {
-        // Authenticate the ESP32 using a shared secret.
+        // 1. Authenticate the ESP32 using the shared secret.
         const expectedKey = process.env.DEVICE_EVENT_KEY;
         const suppliedKey = req.get("x-device-key");
 
@@ -17,6 +19,7 @@ const receiveDeviceEvent = async (req, res) => {
             });
         }
 
+        // 2. Validate the incoming event.
         const { esp32Mac, eventType, distanceCM } = req.body;
 
         if (
@@ -29,13 +32,11 @@ const receiveDeviceEvent = async (req, res) => {
             });
         }
 
+        // 3. Find the registered shoe.
+        const normalizedMac = esp32Mac.trim().toUpperCase();
+
         const device = await Device.findOne({
-            esp32Mac: {
-                $regex: new RegExp(
-                    "^" + esp32Mac.trim().replace(/[.*+?^${}()|[\]\\]/g, "\\$&") + "$",
-                    "i"
-                )
-            }
+            esp32Mac: normalizedMac
         });
 
         if (!device) {
@@ -45,16 +46,27 @@ const receiveDeviceEvent = async (req, res) => {
             });
         }
 
+        // 4. Update device status.
         device.status = "Online";
         device.lastSeen = new Date();
         await device.save();
 
+        // 5. Prepare the notification.
         const isFall = eventType === "FALL";
-        const title = isFall ? "Fall Detected" : "Obstacle Detected";
+
+        const title = isFall
+            ? "🚨 Fall Detected - Smart Shoe"
+            : "⚠️ Obstacle Detected - Smart Shoe";
+
         const message = isFall
             ? `A fall was detected by ${device.shoeName}.`
-            : `An obstacle was detected ${Number(distanceCM).toFixed(1)} cm away.`;
+            : `An obstacle was detected ${
+                Number.isFinite(Number(distanceCM))
+                    ? Number(distanceCM).toFixed(1)
+                    : "nearby"
+            } cm away.`;
 
+        // 6. Save notification in MongoDB.
         const notification = await Notification.create({
             deviceId: device.deviceId,
             title,
@@ -62,6 +74,7 @@ const receiveDeviceEvent = async (req, res) => {
             type: isFall ? "FALL" : "SYSTEM"
         });
 
+        // 7. Save confirmed fall in fall history.
         let fallEvent = null;
 
         if (isFall) {
@@ -72,6 +85,51 @@ const receiveDeviceEvent = async (req, res) => {
             });
         }
 
+        // 8. Send push notification to the shoe owner's phone.
+        // A push failure must not prevent the event being recorded.
+        try {
+            const user = await User.findById(device.parentId);
+
+            if (user && user.fcmToken) {
+                const fcmPayload = {
+                    notification: {
+                        title,
+                        body: message
+                    },
+                    data: {
+                        screen: isFall
+                            ? "ai_detection"
+                            : "notifications",
+                        deviceId: device.deviceId,
+                        eventType,
+                        distanceCM:
+                            Number.isFinite(Number(distanceCM))
+                                ? String(distanceCM)
+                                : ""
+                    },
+                    token: user.fcmToken
+                };
+
+                const fcmResult =
+                    await admin.messaging().send(fcmPayload);
+
+                console.log(
+                    "[FCM SUCCESS] Device event push sent:",
+                    fcmResult
+                );
+            } else {
+                console.warn(
+                    "[FCM WARNING] Shoe owner or FCM token not found"
+                );
+            }
+        } catch (fcmError) {
+            console.error(
+                "[FCM ERROR]",
+                fcmError.message
+            );
+        }
+
+        // 9. Emit real-time Socket.IO events.
         const io = getIO();
 
         io.emit("notification:created", {
@@ -93,11 +151,15 @@ const receiveDeviceEvent = async (req, res) => {
         } else {
             io.emit("obstacle:detected", {
                 deviceId: device.deviceId,
-                distanceCM: Number(distanceCM) || null,
+                distanceCM:
+                    Number.isFinite(Number(distanceCM))
+                        ? Number(distanceCM)
+                        : null,
                 timestamp: notification.createdAt
             });
         }
 
+        // 10. Return success to the ESP32.
         return res.status(201).json({
             success: true,
             message: `${eventType} event recorded`,
@@ -105,6 +167,7 @@ const receiveDeviceEvent = async (req, res) => {
         });
     } catch (error) {
         console.error("[DEVICE EVENT ERROR]", error);
+
         return res.status(500).json({
             success: false,
             message: "Failed to record device event"
