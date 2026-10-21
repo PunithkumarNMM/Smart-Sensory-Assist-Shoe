@@ -1,32 +1,37 @@
+
 const mongoose = require("mongoose");
 
 const fallEventSchema = new mongoose.Schema(
-  {
-    deviceId: {
-      type: String,
-      required: true,
+    {
+        deviceId: {
+            type: String,
+            required: true
+        },
+
+        latitude: {
+            type: Number,
+            default: null
+        },
+
+        longitude: {
+            type: Number,
+            default: null
+        },
+
+        fallDetected: {
+            type: Boolean,
+            default: true
+        },
+
+        severity: {
+            type: String,
+            enum: ["LOW", "MEDIUM", "HIGH"],
+            default: "HIGH"
+        }
     },
-    latitude: {
-      type: Number,
-      required: true,
-    },
-    longitude: {
-      type: Number,
-      required: true,
-    },
-    fallDetected: {
-      type: Boolean,
-      default: true,
-    },
-    severity: {
-      type: String,
-      enum: ["LOW", "MEDIUM", "HIGH"],
-      default: "HIGH",
-    },
-  },
-  {
-    timestamps: true,
-  }
+    {
+        timestamps: true
+    }
 );
 
 module.exports = mongoose.model("FallEvent", fallEventSchema);

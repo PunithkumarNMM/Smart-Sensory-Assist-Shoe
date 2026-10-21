@@ -214,5 +214,10 @@ router.get(
     authMiddleware,
     getDeviceStatus
 );
+// Receive obstacle and fall events from the ESP32
+
+const { receiveDeviceEvent } = require("../controllers/deviceEventController");
+
+router.post("/event", receiveDeviceEvent);
 
 module.exports = router;
